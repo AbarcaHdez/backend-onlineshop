@@ -17,7 +17,6 @@
  *               - name
  *               - slug
  *               - price
- *               - sku
  *             properties:
  *               name:
  *                 type: string
@@ -58,6 +57,27 @@
  *     summary: Obtener todos los productos visibles en el catalogo
  *     tags:
  *       - Productos
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         description: Busqueda de texto libre (name, description, tags)
+ *       - in: query
+ *         name: categoryId
+ *         schema:
+ *           type: string
+ *         description: Filtra por categoria
+ *       - in: query
+ *         name: brandId
+ *         schema:
+ *           type: string
+ *         description: Filtra por marca
+ *       - in: query
+ *         name: includeInactive
+ *         schema:
+ *           type: boolean
+ *         description: Si es true, incluye tambien productos con isActive en false (uso administrativo)
  *     responses:
  *       200:
  *         description: Lista de productos

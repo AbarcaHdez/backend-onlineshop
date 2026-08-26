@@ -1,6 +1,11 @@
 import type { Request, Response } from 'express'
 import Product from '../models/Product'
 
+// Escapa caracteres especiales de regex en input de usuario, para poder usarlo
+// de forma segura como patron de busqueda "contiene" (evita que rompa la regex
+// o se interprete como sintaxis regex, ej. si el usuario busca "a.b" o "a(b").
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 export class ProductController {
 
     static createProduct = async (req: Request, res: Response) => {
@@ -31,13 +36,16 @@ export class ProductController {
     }
 
     static getAllProducts = async (req: Request, res: Response) => {
-        const { q, categoryId, brandId } = req.query
+        const { q, categoryId, brandId, includeInactive } = req.query
         try {
             const filter: any = {
-                show: true,
-                isActive: true
+                show: true
             }
-            if(q) filter.$text = { $search: q as string }
+            if (includeInactive !== 'true') filter.isActive = true
+            if (q) {
+                const regex = new RegExp(escapeRegex(q as string), 'i')
+                filter.$or = [{ name: regex }, { description: regex }, { tags: regex }]
+            }
             if(categoryId) filter.categoryIds = categoryId
             if(brandId) filter.brandId = brandId
 

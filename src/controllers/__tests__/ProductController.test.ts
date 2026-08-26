@@ -58,8 +58,7 @@ const mockQuery = (promise: Promise<unknown>) => {
 const validProductBody = {
     name: 'Cuaderno Profesional',
     slug: 'cuaderno-profesional',
-    price: 65,
-    sku: 'PAP-CUAD-001'
+    price: 65
 }
 
 describe('ProductController', () => {
@@ -78,7 +77,7 @@ describe('ProductController', () => {
 
             expect(response.status).toEqual(400)
             expect(response.body).toHaveProperty('errors')
-            expect(response.body.errors).toHaveLength(8)
+            expect(response.body.errors).toHaveLength(6)
 
             expect(response.status).not.toEqual(404)
             expect(response.body.errors).not.toHaveLength(2)
@@ -98,6 +97,21 @@ describe('ProductController', () => {
             expect(response.status).toBe(201)
             expect(response.body.name).toBe(validProductBody.name)
             expect(save).toHaveBeenCalled()
+        })
+
+        it('debe crear el producto sin enviar sku (campo opcional, no usado en este proyecto)', async () => {
+            const save = jest.fn().mockResolvedValue(undefined)
+            ;(Product as unknown as jest.Mock).mockImplementation(function (this: any, data: any) {
+                Object.assign(this, data, { save })
+                return this
+            })
+
+            const response = await request(server)
+                .post('/api/products').set('Authorization', authHeader)
+                .send(validProductBody)
+
+            expect(response.status).toBe(201)
+            expect(response.body.sku).toBeUndefined()
         })
 
         it('debe responder 400 si faltan campos obligatorios', async () => {
@@ -307,7 +321,7 @@ describe('ProductController', () => {
             expect(response.status).toBe(500)
         })
 
-        it('debe filtrar con $text cuando se envia el query param q', async () => {
+        it('debe filtrar por coincidencia parcial (contiene) cuando se envia el query param q', async () => {
             (Product.find as jest.Mock).mockReturnValue(mockQuery(Promise.resolve([])))
 
             const response = await request(server).get('/api/products?q=perfume')
@@ -316,8 +330,18 @@ describe('ProductController', () => {
             expect(Product.find).toHaveBeenCalledWith({
                 show: true,
                 isActive: true,
-                $text: { $search: 'perfume' }
+                $or: [{ name: /perfume/i }, { description: /perfume/i }, { tags: /perfume/i }]
             })
+        })
+
+        it('debe escapar caracteres especiales de regex en q (no debe romper ni interpretarse como regex)', async () => {
+            (Product.find as jest.Mock).mockReturnValue(mockQuery(Promise.resolve([])))
+
+            const response = await request(server).get(`/api/products?q=${encodeURIComponent('a.b*c')}`)
+
+            expect(response.status).toBe(200)
+            const filter = (Product.find as jest.Mock).mock.calls[0][0]
+            expect(filter.$or[0].name.source).toBe('a\\.b\\*c')
         })
 
         it('debe filtrar por categoryIds cuando se envia el query param categoryId', async () => {
@@ -344,6 +368,15 @@ describe('ProductController', () => {
                 isActive: true,
                 brandId: validBrandId
             })
+        })
+
+        it('debe incluir productos inactivos cuando se envia includeInactive=true', async () => {
+            (Product.find as jest.Mock).mockReturnValue(mockQuery(Promise.resolve([])))
+
+            const response = await request(server).get('/api/products?includeInactive=true')
+
+            expect(response.status).toBe(200)
+            expect(Product.find).toHaveBeenCalledWith({ show: true })
         })
 
         it('debe responder 400 si categoryId no es un ObjectId valido', async () => {

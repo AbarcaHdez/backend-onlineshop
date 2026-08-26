@@ -40,7 +40,7 @@ router.post('/',
         }),
 
     body('sku')
-        .notEmpty().withMessage('El SKU es obligatorio')
+        .optional()
         .isString().withMessage('El SKU debe ser texto')
         .trim(),
 
@@ -116,7 +116,11 @@ router.get('/',
     query('brandId')
         .optional()
         .isMongoId().withMessage('brandId debe ser un id válido'),
-        
+
+    query('includeInactive')
+        .optional()
+        .isBoolean().withMessage('includeInactive debe ser true o false'),
+
     handleInputErrors,
     ProductController.getAllProducts
 )

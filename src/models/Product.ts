@@ -8,7 +8,7 @@ export type ProductType = Document & {
     price: number;
     discountPrice?: number;
 
-    sku: string;
+    sku?: string;
 
     brandId: Types.ObjectId | null;
     categoryIds: Types.ObjectId[];
@@ -77,10 +77,12 @@ const ProductSchema: Schema = new Schema(
         }
     },
 
+    // No se usa en este proyecto por ahora (se dejo opcional para no perder el
+    // campo de cara a una futura necesidad de codigo interno de inventario).
     sku: {
         type: String,
-        required: true,
         unique: true,
+        sparse: true,
         trim: true
     },
 
@@ -143,9 +145,6 @@ const ProductSchema: Schema = new Schema(
 {
     timestamps: true
 });
-
-// Busqueda de texto libre por nombre, descripcion y tags (Product.find({ $text: { $search: "..." } }))
-ProductSchema.index({ name: 'text', description: 'text', tags: 'text' });
 
 // Catalogo publico: getAllProducts filtra siempre por show+isActive, y ademas por categoria o marca
 ProductSchema.index({ show: 1, isActive: 1, categoryIds: 1 });
