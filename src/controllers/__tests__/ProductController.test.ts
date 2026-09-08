@@ -49,6 +49,7 @@ const authHeader = 'Bearer test-token'
 // un objeto "thenable" (con .then) donde .populate() devuelve el mismo objeto.
 const mockQuery = (promise: Promise<unknown>) => {
     const query: any = {
+        sort: jest.fn(() => query),
         populate: jest.fn(() => query),
         then: (onFulfilled?: any, onRejected?: any) => promise.then(onFulfilled, onRejected)
     }

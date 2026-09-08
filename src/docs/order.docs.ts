@@ -14,6 +14,7 @@
  *             required:
  *               - customerName
  *               - items
+ *               - recaptchaToken
  *             properties:
  *               customerName:
  *                 type: string
@@ -32,6 +33,9 @@
  *                     quantity:
  *                       type: integer
  *                       example: 2
+ *               recaptchaToken:
+ *                 type: string
+ *                 description: Token generado por el widget de Google reCAPTCHA v2 en el frontend
  *     responses:
  *       201:
  *         description: Pedido creado correctamente
@@ -46,7 +50,7 @@
  *                   type: string
  *                   example: https://wa.me/521234567890?text=Hola%2C%20me%20interesa...
  *       400:
- *         description: Error de validacion o algun producto no existe/no esta disponible
+ *         description: Error de validacion, algun producto no existe/no esta disponible, o el captcha fallo
  */
 
 /**

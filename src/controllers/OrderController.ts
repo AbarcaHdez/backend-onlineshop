@@ -2,14 +2,22 @@ import type { Request, Response } from 'express'
 import Order from '../models/Order'
 import Product from '../models/Product'
 import Store from '../models/Store'
+import { verifyRecaptcha } from '../utils/recaptcha'
 
 export class OrderController {
 
     // Confirma un pedido: recalcula precios y total contra los productos reales
     // (no se confia en lo que mande el cliente) y devuelve el link de WhatsApp listo para enviar
     static createOrder = async (req: Request, res: Response) => {
-        const { items, customerName } = req.body
+        const { items, customerName, recaptchaToken } = req.body
         try {
+            const isHuman = await verifyRecaptcha(recaptchaToken)
+            if (!isHuman) {
+                return res.status(400).json({
+                    errors: [{ msg: 'Verificacion de captcha fallida. Intenta de nuevo.' }]
+                })
+            }
+
             const productIds = items.map((item: any) => item.productId)
             const uniqueProductIds = [...new Set(productIds)]
 

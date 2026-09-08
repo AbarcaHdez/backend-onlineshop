@@ -4,10 +4,15 @@ import Order from '../../models/Order'
 import Product from '../../models/Product'
 import Store from '../../models/Store'
 import jwt from 'jsonwebtoken'
+import { verifyRecaptcha } from '../../utils/recaptcha'
 
 jest.mock('../../config/db')
 
 jest.mock('jsonwebtoken')
+
+jest.mock('../../utils/recaptcha', () => ({
+    verifyRecaptcha: jest.fn()
+}))
 
 jest.mock('../../models/Order', () => {
     const mockOrder = jest.fn()
@@ -62,7 +67,8 @@ const validOrderBody = {
     items: [
         { productId: productId1, quantity: 2 },
         { productId: productId2, quantity: 1 }
-    ]
+    ],
+    recaptchaToken: 'valid-token'
 }
 
 const mockOrderSave = () => {
@@ -77,7 +83,8 @@ const mockOrderSave = () => {
 describe('OrderController', () => {
 
     beforeEach(() => {
-        (jwt.verify as jest.Mock).mockReturnValue({ id: 'admin-id' })
+        (jwt.verify as jest.Mock).mockReturnValue({ id: 'admin-id' });
+        (verifyRecaptcha as jest.Mock).mockResolvedValue(true)
     })
 
     afterEach(() => {
@@ -145,10 +152,33 @@ describe('OrderController', () => {
 
             const response = await request(server)
                 .post('/api/orders')
-                .send({ customerName: 'Juan', items: [{ productId: productId2, quantity: 1 }] })
+                .send({
+                    customerName: 'Juan',
+                    items: [{ productId: productId2, quantity: 1 }],
+                    recaptchaToken: 'valid-token'
+                })
 
             expect(response.status).toBe(201)
             expect(response.body.order.items[0].price).toBe(300)
+        })
+
+        it('debe responder 400 si recaptchaToken no se envia', async () => {
+            const response = await request(server)
+                .post('/api/orders')
+                .send({ customerName: 'Juan', items: validOrderBody.items })
+
+            expect(response.status).toBe(400)
+            expect(response.body.errors.some((e: any) => e.msg === 'El captcha es obligatorio')).toBe(true)
+        })
+
+        it('debe responder 400 si el captcha no pasa la verificacion de Google', async () => {
+            (verifyRecaptcha as jest.Mock).mockResolvedValue(false)
+
+            const response = await request(server).post('/api/orders').send(validOrderBody)
+
+            expect(response.status).toBe(400)
+            expect(response.body.errors[0].msg).toBe('Verificacion de captcha fallida. Intenta de nuevo.')
+            expect(Product.find).not.toHaveBeenCalled()
         })
 
         it('debe responder 400 si Mongoose lanza un ValidationError al guardar', async () => {

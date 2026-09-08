@@ -20,6 +20,9 @@ router.post('/',
     body('items.*.quantity')
         .isInt({ min: 1 }).withMessage('La cantidad de cada producto debe ser un numero entero mayor a 0'),
 
+    body('recaptchaToken')
+        .notEmpty().withMessage('El captcha es obligatorio'),
+
     handleInputErrors,
     OrderController.createOrder
 )

@@ -50,6 +50,7 @@ export class ProductController {
             if(brandId) filter.brandId = brandId
 
             const products = await Product.find(filter)
+                .sort({ createdAt: -1 })
                 .populate('brandId')
                 .populate('categoryIds')
             res.json(products)
