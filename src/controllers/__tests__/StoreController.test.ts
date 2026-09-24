@@ -24,7 +24,11 @@ const validStoreBody = {
     currency: 'MXN',
     logoUrl: 'https://ejemplo.com/logo.png',
     primaryColor: '#1a1a2e',
-    secondaryColor: '#e94560'
+    secondaryColor: '#e94560',
+    latitude: 19.432608,
+    longitude: -99.133209,
+    facebookUrl: 'https://facebook.com/mitienda',
+    instagramUrl: 'https://instagram.com/mitienda'
 }
 
 describe('StoreController', () => {
@@ -106,13 +110,49 @@ describe('StoreController', () => {
         })
 
         it('debe aceptar campos opcionales vacios (string vacio) sin fallar la validacion', async () => {
-            (Store.findOneAndUpdate as jest.Mock).mockResolvedValue({ name: '', logoUrl: '', primaryColor: '', secondaryColor: '' })
+            (Store.findOneAndUpdate as jest.Mock).mockResolvedValue({ name: '', logoUrl: '', primaryColor: '', secondaryColor: '', facebookUrl: '', instagramUrl: '' })
 
             const response = await request(server)
                 .put('/api/store').set('Authorization', authHeader)
-                .send({ name: '', whatsappNumber: '', logoUrl: '', primaryColor: '', secondaryColor: '', currency: '' })
+                .send({ name: '', whatsappNumber: '', logoUrl: '', primaryColor: '', secondaryColor: '', currency: '', facebookUrl: '', instagramUrl: '' })
 
             expect(response.status).toBe(200)
+        })
+
+        it('debe responder 400 si facebookUrl no es una url valida', async () => {
+            const response = await request(server)
+                .put('/api/store').set('Authorization', authHeader)
+                .send({ facebookUrl: 'no-es-una-url' })
+
+            expect(response.status).toBe(400)
+            expect(response.body.errors.some((e: any) => e.msg === 'facebookUrl debe ser una url valida')).toBe(true)
+        })
+
+        it('debe responder 400 si instagramUrl no es una url valida', async () => {
+            const response = await request(server)
+                .put('/api/store').set('Authorization', authHeader)
+                .send({ instagramUrl: 'no-es-una-url' })
+
+            expect(response.status).toBe(400)
+            expect(response.body.errors.some((e: any) => e.msg === 'instagramUrl debe ser una url valida')).toBe(true)
+        })
+
+        it('debe responder 400 si latitude esta fuera de rango (-90 a 90)', async () => {
+            const response = await request(server)
+                .put('/api/store').set('Authorization', authHeader)
+                .send({ latitude: 120 })
+
+            expect(response.status).toBe(400)
+            expect(response.body.errors.some((e: any) => e.msg === 'latitude debe ser un numero entre -90 y 90')).toBe(true)
+        })
+
+        it('debe responder 400 si longitude esta fuera de rango (-180 a 180)', async () => {
+            const response = await request(server)
+                .put('/api/store').set('Authorization', authHeader)
+                .send({ longitude: 200 })
+
+            expect(response.status).toBe(400)
+            expect(response.body.errors.some((e: any) => e.msg === 'longitude debe ser un numero entre -180 y 180')).toBe(true)
         })
 
         it('debe responder 400 si currency no tiene 3 letras', async () => {

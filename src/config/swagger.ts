@@ -162,6 +162,10 @@ const options: swaggerJSDoc.options = {
                         logoUrl: { type: 'string', example: 'https://ejemplo.com/logo.png' },
                         primaryColor: { type: 'string', example: '#1a1a2e' },
                         secondaryColor: { type: 'string', example: '#e94560' },
+                        latitude: { type: 'number', example: 19.432608 },
+                        longitude: { type: 'number', example: -99.133209 },
+                        facebookUrl: { type: 'string', example: 'https://facebook.com/mitienda' },
+                        instagramUrl: { type: 'string', example: 'https://instagram.com/mitienda' },
                         createdAt: { type: 'string', format: 'date-time' },
                         updatedAt: { type: 'string', format: 'date-time' }
                     }

@@ -7,6 +7,10 @@ export type StoreType = Document & {
     logoUrl: string;
     primaryColor: string;
     secondaryColor: string;
+    latitude?: number;
+    longitude?: number;
+    facebookUrl?: string;
+    instagramUrl?: string;
 
     createdAt: Date;
     updatedAt: Date;
@@ -43,6 +47,24 @@ const StoreSchema: Schema = new Schema({
     },
 
     secondaryColor: {
+        type: String,
+        default: ""
+    },
+
+    latitude: {
+        type: Number
+    },
+
+    longitude: {
+        type: Number
+    },
+
+    facebookUrl: {
+        type: String,
+        default: ""
+    },
+
+    instagramUrl: {
         type: String,
         default: ""
     }

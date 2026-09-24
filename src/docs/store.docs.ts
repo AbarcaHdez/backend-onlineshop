@@ -49,6 +49,18 @@
  *               secondaryColor:
  *                 type: string
  *                 example: '#e94560'
+ *               latitude:
+ *                 type: number
+ *                 example: 19.432608
+ *               longitude:
+ *                 type: number
+ *                 example: -99.133209
+ *               facebookUrl:
+ *                 type: string
+ *                 example: https://facebook.com/mitienda
+ *               instagramUrl:
+ *                 type: string
+ *                 example: https://instagram.com/mitienda
  *     responses:
  *       200:
  *         description: Tienda actualizada

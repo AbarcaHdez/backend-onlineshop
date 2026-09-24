@@ -27,6 +27,20 @@ router.put('/',
     }),
     body('primaryColor').optional({ checkFalsy: true }).isHexColor().withMessage('primaryColor debe ser un color hex valido'),
     body('secondaryColor').optional({ checkFalsy: true }).isHexColor().withMessage('secondaryColor debe ser un color hex valido'),
+    body('latitude').optional({ checkFalsy: true }).isFloat({ min: -90, max: 90 }).withMessage('latitude debe ser un numero entre -90 y 90'),
+    body('longitude').optional({ checkFalsy: true }).isFloat({ min: -180, max: 180 }).withMessage('longitude debe ser un numero entre -180 y 180'),
+    body('facebookUrl').optional({ checkFalsy: true }).custom((value) => {
+        if (!isValidUrl(value)) {
+            throw new Error('facebookUrl debe ser una url valida')
+        }
+        return true
+    }),
+    body('instagramUrl').optional({ checkFalsy: true }).custom((value) => {
+        if (!isValidUrl(value)) {
+            throw new Error('instagramUrl debe ser una url valida')
+        }
+        return true
+    }),
     handleInputErrors,
     StoreController.updateStore
 )
