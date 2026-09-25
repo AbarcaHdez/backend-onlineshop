@@ -166,6 +166,8 @@ const options: swaggerJSDoc.options = {
                         longitude: { type: 'number', example: -99.133209 },
                         facebookUrl: { type: 'string', example: 'https://facebook.com/mitienda' },
                         instagramUrl: { type: 'string', example: 'https://instagram.com/mitienda' },
+                        aboutText: { type: 'string', example: 'Somos una tienda dedicada a ofrecerte productos de calidad...' },
+                        aboutImageUrl: { type: 'string', example: 'https://ejemplo.com/tienda.jpg' },
                         createdAt: { type: 'string', format: 'date-time' },
                         updatedAt: { type: 'string', format: 'date-time' }
                     }

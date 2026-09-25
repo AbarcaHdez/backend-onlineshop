@@ -61,6 +61,12 @@
  *               instagramUrl:
  *                 type: string
  *                 example: https://instagram.com/mitienda
+ *               aboutText:
+ *                 type: string
+ *                 example: Somos una tienda dedicada a ofrecerte productos de calidad...
+ *               aboutImageUrl:
+ *                 type: string
+ *                 example: https://ejemplo.com/tienda.jpg
  *     responses:
  *       200:
  *         description: Tienda actualizada

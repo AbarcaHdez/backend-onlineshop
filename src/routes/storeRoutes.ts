@@ -41,6 +41,13 @@ router.put('/',
         }
         return true
     }),
+    body('aboutText').optional({ checkFalsy: true }).isString(),
+    body('aboutImageUrl').optional({ checkFalsy: true }).custom((value) => {
+        if (!isValidUrl(value)) {
+            throw new Error('aboutImageUrl debe ser una url valida')
+        }
+        return true
+    }),
     handleInputErrors,
     StoreController.updateStore
 )

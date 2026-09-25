@@ -28,7 +28,9 @@ const validStoreBody = {
     latitude: 19.432608,
     longitude: -99.133209,
     facebookUrl: 'https://facebook.com/mitienda',
-    instagramUrl: 'https://instagram.com/mitienda'
+    instagramUrl: 'https://instagram.com/mitienda',
+    aboutText: 'Somos una tienda dedicada a ofrecerte productos de calidad.',
+    aboutImageUrl: 'https://ejemplo.com/tienda.jpg'
 }
 
 describe('StoreController', () => {
@@ -110,11 +112,11 @@ describe('StoreController', () => {
         })
 
         it('debe aceptar campos opcionales vacios (string vacio) sin fallar la validacion', async () => {
-            (Store.findOneAndUpdate as jest.Mock).mockResolvedValue({ name: '', logoUrl: '', primaryColor: '', secondaryColor: '', facebookUrl: '', instagramUrl: '' })
+            (Store.findOneAndUpdate as jest.Mock).mockResolvedValue({ name: '', logoUrl: '', primaryColor: '', secondaryColor: '', facebookUrl: '', instagramUrl: '', aboutText: '', aboutImageUrl: '' })
 
             const response = await request(server)
                 .put('/api/store').set('Authorization', authHeader)
-                .send({ name: '', whatsappNumber: '', logoUrl: '', primaryColor: '', secondaryColor: '', currency: '', facebookUrl: '', instagramUrl: '' })
+                .send({ name: '', whatsappNumber: '', logoUrl: '', primaryColor: '', secondaryColor: '', currency: '', facebookUrl: '', instagramUrl: '', aboutText: '', aboutImageUrl: '' })
 
             expect(response.status).toBe(200)
         })
@@ -135,6 +137,15 @@ describe('StoreController', () => {
 
             expect(response.status).toBe(400)
             expect(response.body.errors.some((e: any) => e.msg === 'instagramUrl debe ser una url valida')).toBe(true)
+        })
+
+        it('debe responder 400 si aboutImageUrl no es una url valida', async () => {
+            const response = await request(server)
+                .put('/api/store').set('Authorization', authHeader)
+                .send({ aboutImageUrl: 'no-es-una-url' })
+
+            expect(response.status).toBe(400)
+            expect(response.body.errors.some((e: any) => e.msg === 'aboutImageUrl debe ser una url valida')).toBe(true)
         })
 
         it('debe responder 400 si latitude esta fuera de rango (-90 a 90)', async () => {

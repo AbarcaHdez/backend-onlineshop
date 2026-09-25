@@ -11,6 +11,8 @@ export type StoreType = Document & {
     longitude?: number;
     facebookUrl?: string;
     instagramUrl?: string;
+    aboutText: string;
+    aboutImageUrl: string;
 
     createdAt: Date;
     updatedAt: Date;
@@ -65,6 +67,17 @@ const StoreSchema: Schema = new Schema({
     },
 
     instagramUrl: {
+        type: String,
+        default: ""
+    },
+
+    aboutText: {
+        type: String,
+        default: "Somos una tienda dedicada a ofrecerte productos de calidad con una atención cercana y personalizada. Nuestro objetivo es que encuentres justo lo que buscas, de forma simple y confiable.",
+        trim: true
+    },
+
+    aboutImageUrl: {
         type: String,
         default: ""
     }
